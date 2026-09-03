@@ -1,0 +1,5 @@
+#!name=SEANZ-域名去广告
+#!desc=域名去广告：域名规则 Advertising_All
+
+[Rule]
+RULE-SET, https://cdn.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Surge/Advertising/Advertising_All_No_Resolve.list, REJECT, update-interval=43200
