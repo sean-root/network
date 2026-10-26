@@ -1,0 +1,31 @@
+# NAME: Downloads-CDN
+# REPO: https://github.com/sean-root/network
+# 大文件下载 / 系统更新 CDN
+# TOTAL: 25
+
+payload:
+  - DOMAIN-SUFFIX,updates.cdn-apple.com
+  - DOMAIN-SUFFIX,updates.download-apple.com
+  - DOMAIN-SUFFIX,swcdn.apple.com
+  - DOMAIN-SUFFIX,swdownload.apple.com
+  - DOMAIN-SUFFIX,tv.apple.com
+  - DOMAIN-SUFFIX,apptrailers.itunes.apple.com
+  - DOMAIN-SUFFIX,iosapps.itunes.apple.com
+  - DOMAIN-SUFFIX,osxapps.itunes.apple.com
+  - DOMAIN-SUFFIX,icloud-content.com
+  - DOMAIN-SUFFIX,apple-dns.cn
+  - DOMAIN-SUFFIX,devimages-cdn.apple.com
+  - DOMAIN-SUFFIX,devimages-download.apple.com
+  - DOMAIN-SUFFIX,devstreaming-cdn.apple.com
+  - DOMAIN-SUFFIX,devstreaming-download.apple.com
+  - DOMAIN-SUFFIX,download.developer.apple.com
+  - DOMAIN-SUFFIX,officecdn-microsoft-com.akamaized.net
+  - DOMAIN-SUFFIX,dl.nssurge.com
+  - DOMAIN-SUFFIX,ccmdls.adobe.com
+  - DOMAIN-SUFFIX,static.adtidy.org
+  - DOMAIN-SUFFIX,cloudflarestorage.com
+  - DOMAIN-SUFFIX,cdn-lfs-us-1.hf.co
+  - DOMAIN-SUFFIX,cdn-lfs-us-2.hf.co
+  - DOMAIN-SUFFIX,cdn-lfs-us-3.hf.co
+  - DOMAIN-SUFFIX,onecdn.static.microsoft
+  - DOMAIN-SUFFIX,onecdn.static.microsoft.com
