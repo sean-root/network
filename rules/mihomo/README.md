@@ -24,6 +24,7 @@ rules:
 
 - `behavior` 必须为 `classical`：文件中混有域名、IP-CIDR 与 IP-ASN 规则，IP 类规则已逐条带 `no-resolve`。
 - `IP-ASN` 规则依赖 ASN 数据库，需在 `geox-url` 中配置 `asn`。
+- ChatGPT Voice IP 段由 [GitHub Action](../../.github/workflows/update-chatgpt-voice.yml) 每天从 `chatgpt-voice.json` 自动同步，请勿手动编辑该段。
 - `path` 请使用独立文件名，避免与其他规则集（如 blackmatrix7 的 `Anthropic.yaml`）的缓存互相覆盖。
 - 已包含 [blackmatrix7](https://github.com/blackmatrix7/ios_rule_script/tree/master/rule/Clash) 同名规则集的条目（OpenAI 中的 `IP-ASN,20473` 除外，该 ASN 为 Vultr 全段），可与其并用，本仓库规则集放在前面。
 - 内容与 [`../surge/`](../surge/) 下的同名 `.list` 一致，修改时需同步。

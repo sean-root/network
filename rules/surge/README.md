@@ -18,6 +18,7 @@ RULE-SET, https://raw.githubusercontent.com/sean-root/network/main/rules/surge/D
 ## 说明
 
 - IP 类规则已逐条带 `no-resolve`，`RULE-SET` 行无需再加。
+- ChatGPT Voice IP 段由 [GitHub Action](../../.github/workflows/update-chatgpt-voice.yml) 每天从 `chatgpt-voice.json` 自动同步，请勿手动编辑该段。
 - 已包含 [blackmatrix7](https://github.com/blackmatrix7/ios_rule_script/tree/master/rule/Surge) 同名规则集的条目（OpenAI 中的 `IP-ASN,20473` 除外，该 ASN 为 Vultr 全段），可与其并用，本仓库规则集放在前面。
 - 数据来源：
   - [Network recommendations for ChatGPT errors on web and apps](https://help.openai.com/en/articles/9247338-network-recommendations-for-chatgpt-errors-on-web-and-apps)

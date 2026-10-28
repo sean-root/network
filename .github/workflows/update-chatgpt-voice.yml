@@ -1,0 +1,34 @@
+name: Update ChatGPT Voice IPs
+
+on:
+  schedule:
+    - cron: "17 2 * * *"
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - scripts/update-chatgpt-voice.py
+      - .github/workflows/update-chatgpt-voice.yml
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Sync voice IP section
+        run: python3 scripts/update-chatgpt-voice.py
+
+      - name: Commit changes
+        run: |
+          if git diff --quiet; then
+            echo "No changes."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -am "Update ChatGPT Voice IPs"
+          git push
