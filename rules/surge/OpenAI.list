@@ -1,6 +1,6 @@
 # NAME: OpenAI
 # REPO: https://github.com/sean-root/network
-# UPDATED: 2026-10-28T10:50:02Z
+# UPDATED: 2026-10-28T11:45:10Z
 # TOTAL: 458
 
 # 手工维护：sources/OpenAI.list
@@ -58,7 +58,7 @@ IP-CIDR,24.199.123.28/32,no-resolve
 IP-CIDR,64.23.132.171/32,no-resolve
 IP-ASN,401864,no-resolve
 
-# v2fly：https://github.com/v2fly/domain-list-community/blob/master/data/openai
+# 补充
 DOMAIN-SUFFIX,chat.com
 DOMAIN-SUFFIX,chatgpt.site
 DOMAIN-SUFFIX,crixet.com

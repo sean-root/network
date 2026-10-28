@@ -1,6 +1,6 @@
 # NAME: Anthropic
 # REPO: https://github.com/sean-root/network
-# UPDATED: 2026-10-28T10:50:02Z
+# UPDATED: 2026-10-28T11:45:10Z
 # TOTAL: 43
 
 payload:
@@ -43,7 +43,7 @@ payload:
   # Anthropic 官方：https://platform.claude.com/docs/en/api/ip-addresses
   - IP-CIDR,160.79.104.0/21,no-resolve
 
-  # v2fly：https://github.com/v2fly/domain-list-community/blob/master/data/anthropic
+  # 补充
   - DOMAIN-SUFFIX,ant.dev
   - DOMAIN-SUFFIX,anthropic.team
   - DOMAIN-SUFFIX,antspace.dev
@@ -54,8 +54,6 @@ payload:
   - DOMAIN-SUFFIX,claudeacademy.com
   - DOMAIN-SUFFIX,claudepages.dev
   - DOMAIN-SUFFIX,claudestudio.com
-
-  # 社区：https://ip.net.coffee/claude/site.html
   - DOMAIN-SUFFIX,datadoghq.com
   - DOMAIN-KEYWORD,datadog
   - DOMAIN-KEYWORD,sift

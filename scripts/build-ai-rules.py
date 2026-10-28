@@ -55,6 +55,7 @@ class Section:
     title: str
     rules: list
     lines: list = None  # manual sections keep their comments: str or rule tuple
+    official: bool = True  # non-official sections are published together without attribution
 
 
 def fail(message):
@@ -187,7 +188,7 @@ def ripestat(asns):
         require(data.get("status") == "ok", f"RIPEstat AS{asn}: status {data.get('status')}")
         rules += [normalize("IP-CIDR", p["prefix"]) for p in data["data"]["prefixes"]]
     title = "、".join(f"AS{a}" for a in asns)
-    return Section(f"BGP 路由（RIPEstat）：{title}", rules)
+    return Section(f"BGP 路由（RIPEstat）：{title}", rules, official=False)
 
 
 def v2fly(name, seen=None):
@@ -207,19 +208,19 @@ def v2fly(name, seen=None):
         rules.append(normalize({"full": "DOMAIN", "domain": "DOMAIN-SUFFIX",
                                 "keyword": "DOMAIN-KEYWORD", "regexp": "DOMAIN-REGEX"}[kind], value))
     require(len(rules) >= 5, f"v2fly {name}: only {len(rules)} entries")
-    return Section(f"v2fly：{V2FLY_PAGE.format(name)}", rules)
+    return Section(f"v2fly：{V2FLY_PAGE.format(name)}", rules, official=False)
 
 
 def net_coffee():
     rules = parse_rules(html_to_text(fetch(NET_COFFEE)))
     require(len(rules) >= 10, f"ip.net.coffee: only {len(rules)} rules")
-    return Section(f"社区：{NET_COFFEE}", rules)
+    return Section(f"社区：{NET_COFFEE}", rules, official=False)
 
 
 def blackmatrix7(name):
     rules = parse_rules(fetch(BM7.format(name)))
     require(rules, f"blackmatrix7 {name}: empty")
-    return Section(f"blackmatrix7：{BM7_PAGE.format(name)}", rules)
+    return Section(f"blackmatrix7：{BM7_PAGE.format(name)}", rules, official=False)
 
 
 # ---------------------------------------------------------------- merge
@@ -256,6 +257,19 @@ def merge(sections):
         if section.lines is not None:
             section.lines = [x for x in section.lines if isinstance(x, str) or x in section.rules]
     return sum(len(s.rules) for s in sections), removed
+
+
+def combine_unofficial(sections):
+    combined, out = None, []
+    for section in sections:
+        if section.official:
+            out.append(section)
+        elif combined is None:
+            combined = Section("补充", list(section.rules))
+            out.append(combined)
+        else:
+            combined.rules += section.rules
+    return out
 
 
 # ---------------------------------------------------------------- output
@@ -350,7 +364,7 @@ def main():
         print(f"{name}: {total} rules after merge, {removed} covered by broader rules")
         for section in sections:
             print(f"  {len(section.rules):4d}  {section.title}")
-    outputs = [render_file(name, sections, target, updated, notes)
+    outputs = [render_file(name, combine_unofficial(sections), target, updated, notes)
                for name, sections in (("Anthropic", anthropic), ("OpenAI", openai))
                for target in ("surge", "mihomo")]
     for path, text, total in outputs:
