@@ -1,9 +1,9 @@
 # NAME: Anthropic
 # REPO: https://github.com/sean-root/network
-# 参考：https://claude.com/docs/third-party/claude-desktop/telemetry
-#       https://platform.claude.com/docs/en/api/ip-addresses
-# TOTAL: 29
+# UPDATED: 2026-10-28T10:48:44Z
+# TOTAL: 43
 
+# 手工维护：sources/Anthropic.list
 DOMAIN-SUFFIX,anthropic.com
 DOMAIN-SUFFIX,claude.ai
 DOMAIN-SUFFIX,claude.com
@@ -27,7 +27,6 @@ DOMAIN-SUFFIX,intercom.io
 DOMAIN-SUFFIX,intercomcdn.com
 DOMAIN-SUFFIX,hcaptcha.com
 DOMAIN,cdn.usefathom.com
-DOMAIN,http-intake.logs.us5.datadoghq.com
 DOMAIN,browser-intake-us5-datadoghq.com
 DOMAIN,browser-intake-datadoghq.com
 DOMAIN,browser-intake-us3-datadoghq.com
@@ -36,6 +35,27 @@ DOMAIN,browser-intake-ap2-datadoghq.com
 DOMAIN,browser-intake-datadoghq.eu
 
 # API 入站地址与自有 ASN
-IP-CIDR,160.79.104.0/23,no-resolve
-IP-CIDR6,2607:6bc0::/48,no-resolve
 IP-ASN,399358,no-resolve
+IP-ASN,400243,no-resolve
+IP-ASN,401551,no-resolve
+
+# Anthropic 官方：https://platform.claude.com/docs/en/api/ip-addresses
+IP-CIDR,160.79.104.0/21,no-resolve
+
+# v2fly：https://github.com/v2fly/domain-list-community/blob/master/data/anthropic
+DOMAIN-SUFFIX,ant.dev
+DOMAIN-SUFFIX,anthropic.team
+DOMAIN-SUFFIX,antspace.dev
+DOMAIN-SUFFIX,chatbotclaude.com
+DOMAIN-SUFFIX,claude.dev
+DOMAIN-SUFFIX,claude.new
+DOMAIN-SUFFIX,claude.site
+DOMAIN-SUFFIX,claudeacademy.com
+DOMAIN-SUFFIX,claudepages.dev
+DOMAIN-SUFFIX,claudestudio.com
+
+# 社区：https://ip.net.coffee/claude/site.html
+DOMAIN-SUFFIX,datadoghq.com
+DOMAIN-KEYWORD,datadog
+DOMAIN-KEYWORD,sift
+IP-CIDR6,2607:6bc0::/32,no-resolve

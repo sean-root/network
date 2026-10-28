@@ -1,10 +1,10 @@
 # NAME: OpenAI
 # REPO: https://github.com/sean-root/network
-# 参考：https://help.openai.com/en/articles/9247338-network-recommendations-for-chatgpt-errors-on-web-and-apps
-#       https://openai.com/chatgpt-voice.json
-# TOTAL: 449
+# UPDATED: 2026-10-28T10:48:44Z
+# TOTAL: 458
 
 payload:
+  # 手工维护：sources/OpenAI.list
   - DOMAIN-SUFFIX,openai.com
   - DOMAIN-SUFFIX,chatgpt.com
   - DOMAIN-SUFFIX,oaistatic.com
@@ -34,7 +34,6 @@ payload:
   # 已知兼容服务
   - DOMAIN,browser-intake-datadoghq.com
   - DOMAIN,static.cloudflareinsights.com
-  - DOMAIN,chat.openai.com.cdn.cloudflare.net
   - DOMAIN,openai-api.arkoselabs.com
   - DOMAIN,openaicom-api-bdcpf8c6d2e9atf6.z01.azurefd.net
   - DOMAIN,openaicomproductionae4b.blob.core.windows.net
@@ -55,11 +54,23 @@ payload:
   - DOMAIN-SUFFIX,identrust.com
   - DOMAIN-KEYWORD,openai
 
-  # 已知兼容 IP
+  # 已知兼容 IP 与自有 ASN
   - IP-CIDR,24.199.123.28/32,no-resolve
   - IP-CIDR,64.23.132.171/32,no-resolve
+  - IP-ASN,401864,no-resolve
 
-  # ChatGPT Voice：官方 IP 清单 https://openai.com/chatgpt-voice.json
+  # v2fly：https://github.com/v2fly/domain-list-community/blob/master/data/openai
+  - DOMAIN-SUFFIX,chat.com
+  - DOMAIN-SUFFIX,chatgpt.site
+  - DOMAIN-SUFFIX,crixet.com
+  - DOMAIN-SUFFIX,openai.org
+  - DOMAIN-SUFFIX,sora.com
+  - DOMAIN-SUFFIX,openai.com.cdn.cloudflare.net
+  - DOMAIN,openaiassets.blob.core.windows.net
+  - 'DOMAIN-REGEX,^chatgpt-async-webps-prod-\S+-\d+\.webpubsub\.azure\.com$'
+  - DOMAIN,openai.qualtrics.com
+
+  # ChatGPT Voice：https://openai.com/chatgpt-voice.json
   - IP-CIDR,102.37.57.54/32,no-resolve
   - IP-CIDR,104.211.223.134/32,no-resolve
   - IP-CIDR,104.215.182.146/32,no-resolve

@@ -1,0 +1,41 @@
+name: Update AI rules
+
+on:
+  schedule:
+    - cron: "17 2 * * *"
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - scripts/build-ai-rules.py
+      - sources/**
+      - .github/workflows/update-ai-rules.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-ai-rules
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build rule sets
+        run: python3 scripts/build-ai-rules.py
+
+      - name: Commit
+        run: |
+          if git diff --quiet -I '^# UPDATED: ' -- rules; then
+            summary="no rule changes"
+          else
+            summary="rules changed"
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -am "Update AI rules $(date -u +%F): ${summary}"
+          git pull --rebase origin main
+          git push
