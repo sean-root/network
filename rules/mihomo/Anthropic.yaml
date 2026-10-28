@@ -1,60 +1,70 @@
 # NAME: Anthropic
 # REPO: https://github.com/sean-root/network
-# UPDATED: 2026-10-28T11:51:25Z
+# UPDATED: 2026-10-28T11:59:03Z
+# SOURCE: https://platform.claude.com/docs/en/api/ip-addresses
+# SOURCE: https://code.claude.com/docs/en/network-config
+# SOURCE: https://claude.com/docs/third-party/claude-desktop/telemetry
+# SOURCE: https://claude.com/docs/claude-science/network-requirements
+# DOMAIN: 11
+# DOMAIN-SUFFIX: 25
+# DOMAIN-KEYWORD: 2
+# IP-CIDR: 1
+# IP-CIDR6: 1
+# IP-ASN: 3
 # TOTAL: 43
 
 payload:
-  # 手工维护：sources/Anthropic.list
-  - DOMAIN-SUFFIX,anthropic.com
-  - DOMAIN-SUFFIX,claude.ai
-  - DOMAIN-SUFFIX,claude.com
-  - DOMAIN-SUFFIX,claude.app
-  - DOMAIN-SUFFIX,claudeusercontent.com
-  - DOMAIN-SUFFIX,claudemcpcontent.com
-
-  # 兼容域名
-  - DOMAIN-SUFFIX,clau.de
-  - DOMAIN-SUFFIX,claudemcpclient.com
-  - DOMAIN,anthropic.com.cdn.cloudflare.net
-  - DOMAIN,servd-anthropic-website.b-cdn.net
+  # DOMAIN
   - DOMAIN,anthropic.auth0.com
-  - DOMAIN,anthropic-com.ghost.io
-
-  # 遥测、风控、客服
-  - DOMAIN-SUFFIX,sentry.io
-  - DOMAIN-SUFFIX,statsigapi.net
-  - DOMAIN-SUFFIX,sift.com
-  - DOMAIN-SUFFIX,intercom.io
-  - DOMAIN-SUFFIX,intercomcdn.com
-  - DOMAIN-SUFFIX,hcaptcha.com
-  - DOMAIN,cdn.usefathom.com
-  - DOMAIN,browser-intake-us5-datadoghq.com
-  - DOMAIN,browser-intake-datadoghq.com
-  - DOMAIN,browser-intake-us3-datadoghq.com
+  - DOMAIN,servd-anthropic-website.b-cdn.net
   - DOMAIN,browser-intake-ap1-datadoghq.com
   - DOMAIN,browser-intake-ap2-datadoghq.com
+  - DOMAIN,browser-intake-datadoghq.com
   - DOMAIN,browser-intake-datadoghq.eu
+  - DOMAIN,browser-intake-us3-datadoghq.com
+  - DOMAIN,browser-intake-us5-datadoghq.com
+  - DOMAIN,anthropic.com.cdn.cloudflare.net
+  - DOMAIN,anthropic-com.ghost.io
+  - DOMAIN,cdn.usefathom.com
 
-  # API 入站地址与自有 ASN
-  - IP-ASN,399358,no-resolve
-  - IP-ASN,400243,no-resolve
-  - IP-ASN,401551,no-resolve
-
-  # Anthropic 官方：https://platform.claude.com/docs/en/api/ip-addresses
-  - IP-CIDR,160.79.104.0/21,no-resolve
-
-  # 补充
+  # DOMAIN-SUFFIX
   - DOMAIN-SUFFIX,ant.dev
+  - DOMAIN-SUFFIX,anthropic.com
   - DOMAIN-SUFFIX,anthropic.team
   - DOMAIN-SUFFIX,antspace.dev
   - DOMAIN-SUFFIX,chatbotclaude.com
+  - DOMAIN-SUFFIX,clau.de
+  - DOMAIN-SUFFIX,claude.ai
+  - DOMAIN-SUFFIX,claude.app
+  - DOMAIN-SUFFIX,claude.com
   - DOMAIN-SUFFIX,claude.dev
   - DOMAIN-SUFFIX,claude.new
   - DOMAIN-SUFFIX,claude.site
   - DOMAIN-SUFFIX,claudeacademy.com
+  - DOMAIN-SUFFIX,claudemcpclient.com
+  - DOMAIN-SUFFIX,claudemcpcontent.com
   - DOMAIN-SUFFIX,claudepages.dev
   - DOMAIN-SUFFIX,claudestudio.com
+  - DOMAIN-SUFFIX,claudeusercontent.com
   - DOMAIN-SUFFIX,datadoghq.com
+  - DOMAIN-SUFFIX,hcaptcha.com
+  - DOMAIN-SUFFIX,intercom.io
+  - DOMAIN-SUFFIX,intercomcdn.com
+  - DOMAIN-SUFFIX,sentry.io
+  - DOMAIN-SUFFIX,sift.com
+  - DOMAIN-SUFFIX,statsigapi.net
+
+  # DOMAIN-KEYWORD
   - DOMAIN-KEYWORD,datadog
   - DOMAIN-KEYWORD,sift
+
+  # IP-CIDR
+  - IP-CIDR,160.79.104.0/21,no-resolve
+
+  # IP-CIDR6
   - IP-CIDR6,2607:6bc0::/32,no-resolve
+
+  # IP-ASN
+  - IP-ASN,399358,no-resolve
+  - IP-ASN,400243,no-resolve
+  - IP-ASN,401551,no-resolve

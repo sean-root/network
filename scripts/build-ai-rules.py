@@ -54,8 +54,8 @@ ANTHROPIC_OWNED = ("anthropic.com", "claude.ai", "claude.com", "claude.app", "cl
 class Section:
     title: str
     rules: list
-    lines: list = None  # manual sections keep their comments: str or rule tuple
-    official: bool = True  # non-official sections are published together without attribution
+    url: str = None  # official pages are listed in the generated file header
+    official: bool = True
 
 
 def fail(message):
@@ -118,17 +118,9 @@ def under(host, suffixes):
 
 def manual(name):
     path = ROOT / "sources" / f"{name}.list"
-    body = path.read_text(encoding="utf-8").split("\n\n", 1)[1]
-    lines, rules = [], []
-    for line in body.splitlines():
-        parsed = parse_rules(line)
-        if parsed:
-            lines.append(parsed[0])
-            rules.append(parsed[0])
-        else:
-            lines.append(line.rstrip())
+    rules = parse_rules(path.read_text(encoding="utf-8"))
     require(rules, f"{path.name} has no rules")
-    return Section(f"手工维护：sources/{name}.list", rules, lines)
+    return Section(f"手工维护：sources/{name}.list", rules)
 
 
 def openai_help():
@@ -147,14 +139,14 @@ def openai_help():
     require(len(tokens) >= 20, f"OpenAI help page: only {len(tokens)} domains")
     rules = [host_rule(t) for t in tokens]
     rules += [("DOMAIN", h) for h in re.findall(rf"wss://({HOST})", text.lower())]
-    return Section(f"OpenAI 官方：{OPENAI_HELP}", rules)
+    return Section(f"OpenAI 官方：{OPENAI_HELP}", rules, OPENAI_HELP)
 
 
 def openai_voice():
     prefixes = json.loads(fetch(OPENAI_VOICE))["prefixes"]
     rules = [normalize("IP-CIDR", p.get("ipv4Prefix") or p.get("ipv6Prefix")) for p in prefixes]
     require(len(rules) >= 50, f"chatgpt-voice.json: only {len(rules)} prefixes")
-    return Section(f"ChatGPT Voice：{OPENAI_VOICE}", rules)
+    return Section(f"ChatGPT Voice：{OPENAI_VOICE}", rules, OPENAI_VOICE)
 
 
 def anthropic_ips():
@@ -162,7 +154,7 @@ def anthropic_ips():
     rules = [normalize("IP-CIDR", c) for c in re.findall(r"`([0-9a-fA-F:.]+/\d+)`", text)]
     require(any(k == "IP-CIDR" for k, _ in rules) and any(k == "IP-CIDR6" for k, _ in rules),
             "Anthropic IP page: missing IPv4 or IPv6 ranges")
-    return Section(f"Anthropic 官方：{ANTHROPIC_IPS}", rules)
+    return Section(f"Anthropic 官方：{ANTHROPIC_IPS}", rules, ANTHROPIC_IPS)
 
 
 def claude_docs(owned, skipped):
@@ -177,7 +169,7 @@ def claude_docs(owned, skipped):
             else:
                 skipped.add(rule[1])
         require(len(rules) >= 3, f"{url}: only {len(rules)} Claude hosts")
-        sections.append(Section(f"Claude 官方：{url}", rules))
+        sections.append(Section(f"Claude 官方：{url}", rules, url))
     return sections
 
 
@@ -254,25 +246,13 @@ def merge(sections):
         before = len(section.rules)
         section.rules = [r for r in section.rules if not covered(r)]
         removed += before - len(section.rules)
-        if section.lines is not None:
-            section.lines = [x for x in section.lines if isinstance(x, str) or x in section.rules]
     return sum(len(s.rules) for s in sections), removed
 
 
-def combine_unofficial(sections):
-    combined, out = None, []
-    for section in sections:
-        if section.official:
-            out.append(section)
-        elif combined is None:
-            combined = Section("补充", list(section.rules))
-            out.append(combined)
-        else:
-            combined.rules += section.rules
-    return out
-
-
 # ---------------------------------------------------------------- output
+
+TYPE_ORDER = ("DOMAIN", "DOMAIN-SUFFIX", "DOMAIN-KEYWORD", "DOMAIN-WILDCARD", "DOMAIN-REGEX",
+              "IP-CIDR", "IP-CIDR6", "IP-ASN")
 
 def regex_to_wildcard(pattern):
     wildcard = re.sub(r"\\S\+|\\w\+|\\d\+|\.\+|\.\*|\[\^\.\]\+|\[[a-z0-9\\-]+\]\+", "*",
@@ -284,58 +264,60 @@ def wildcard_to_regex(wildcard):
     return "^" + re.escape(wildcard).replace(r"\*", ".*").replace(r"\?", ".") + "$"
 
 
-def render(rule, target, notes):
+def convert(rule, target, notes):
     kind, value = rule
     if target == "surge" and kind == "DOMAIN-REGEX":
         wildcard = regex_to_wildcard(value)
         if wildcard is None:
             notes.append(f"surge: skipped regex {value}")
             return None
-        kind, value = "DOMAIN-WILDCARD", wildcard
+        return "DOMAIN-WILDCARD", wildcard
     if target == "mihomo" and kind == "DOMAIN-WILDCARD":
-        kind, value = "DOMAIN-REGEX", wildcard_to_regex(value)
+        return "DOMAIN-REGEX", wildcard_to_regex(value)
+    return kind, value
+
+
+def sort_key(kind, value):
+    if kind in ("IP-CIDR", "IP-CIDR6"):
+        network = ipaddress.ip_network(value)
+        return int(network.network_address), network.prefixlen
+    if kind == "IP-ASN":
+        return int(value)
+    if kind in ("DOMAIN", "DOMAIN-SUFFIX"):
+        labels = value.split(".")
+        return labels[-2:], labels[:-2][::-1]
+    return value
+
+
+def format_rule(kind, value, target):
     text = f"{kind},{value}" + (",no-resolve" if kind in IP_TYPES else "")
     if target == "mihomo":
         return "  - " + (f"'{text}'" if kind == "DOMAIN-REGEX" else text)
     return text
 
 
-def body_lines(sections, target, notes):
-    comment = "  # " if target == "mihomo" else "# "
-    out = []
-    for section in sections:
-        if not section.rules:
-            continue
-        out += ["", comment + section.title]
-        items = section.lines if section.lines is not None else section.rules
-        for item in items:
-            if isinstance(item, str):
-                if not item:
-                    out.append("")
-                elif item.startswith("#"):
-                    out.append(comment + item.lstrip("# ").rstrip())
-                continue
-            rendered = render(item, target, notes)
-            if rendered:
-                out.append(rendered)
-    collapsed = []
-    for line in out:
-        if line == "" and collapsed and collapsed[-1] == "":
-            continue
-        collapsed.append(line)
-    return collapsed
-
-
 def render_file(name, sections, target, updated, notes):
     path = ROOT / (f"rules/surge/{name}.list" if target == "surge" else f"rules/mihomo/{name}.yaml")
-    body = body_lines(sections, target, notes)
-    prefix = "  - " if target == "mihomo" else ""
-    total = sum(1 for line in body if line and not line.lstrip().startswith("#") and line.startswith(prefix))
+    groups = {}
+    for section in sections:
+        for rule in section.rules:
+            converted = convert(rule, target, notes)
+            if converted:
+                groups.setdefault(converted[0], {})[converted[1]] = None
+    comment = "  # " if target == "mihomo" else "# "
+    counts, body = [], []
+    for kind in TYPE_ORDER:
+        values = sorted(groups.get(kind, ()), key=lambda v: sort_key(kind, v))
+        if values:
+            counts.append(f"# {kind}: {len(values)}")
+            body += ["", comment + kind] + [format_rule(kind, v, target) for v in values]
+    total = sum(len(v) for v in groups.values())
     if path.exists():
         previous = re.search(r"^# TOTAL: (\d+)$", path.read_text(encoding="utf-8"), re.M)
         require(not previous or total >= int(previous.group(1)) * 0.8,
                 f"{path.relative_to(ROOT)}: {total} rules, down from {previous and previous.group(1)}")
-    header = [f"# NAME: {name}", f"# REPO: {REPO}", f"# UPDATED: {updated}", f"# TOTAL: {total}"]
+    sources = [f"# SOURCE: {s.url}" for s in sections if s.official and s.url]
+    header = [f"# NAME: {name}", f"# REPO: {REPO}", f"# UPDATED: {updated}", *sources, *counts, f"# TOTAL: {total}"]
     if target == "mihomo":
         body = ["", "payload:"] + body[1:]
     return path, "\n".join(header + body) + "\n", total
@@ -364,7 +346,7 @@ def main():
         print(f"{name}: {total} rules after merge, {removed} covered by broader rules")
         for section in sections:
             print(f"  {len(section.rules):4d}  {section.title}")
-    outputs = [render_file(name, combine_unofficial(sections), target, updated, notes)
+    outputs = [render_file(name, sections, target, updated, notes)
                for name, sections in (("Anthropic", anthropic), ("OpenAI", openai))
                for target in ("surge", "mihomo")]
     for path, text, total in outputs:
