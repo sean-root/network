@@ -13,6 +13,7 @@ import ipaddress
 import json
 import pathlib
 import re
+import subprocess
 import time
 import urllib.request
 
@@ -296,6 +297,46 @@ def format_rule(kind, value, target):
     return text
 
 
+def without_stamps(text):
+    return "\n".join(line for line in text.splitlines()
+                     if not re.match(r"# (UPDATED|CHANGED): ", line.strip()))
+
+
+def git_last_data_change(path):
+    relative = path.relative_to(ROOT)
+    try:
+        log = subprocess.check_output(
+            ["git", "log", "--format=%H %cI", "--", relative],
+            cwd=ROOT, text=True, stderr=subprocess.DEVNULL)
+    except subprocess.CalledProcessError:
+        return None
+    for line in log.splitlines():
+        sha, date = line.split(" ", 1)
+        diff = subprocess.check_output(
+            ["git", "show", "--format=", sha, "--", relative],
+            cwd=ROOT, text=True, stderr=subprocess.DEVNULL)
+        for row in diff.splitlines():
+            if row.startswith(("diff ", "index ", "@@", "+++", "---", "new file", "deleted file")):
+                continue
+            if row[:1] not in "+-":
+                continue
+            body = row[1:].strip()
+            if re.match(r"# (UPDATED|CHANGED): ", body):
+                continue
+            return date.replace("+00:00", "Z")
+    return None
+
+
+def last_changed(path, new_text, now):
+    old = path.read_text(encoding="utf-8") if path.exists() else ""
+    if without_stamps(old) != without_stamps(new_text):
+        return now
+    match = re.search(r"^# CHANGED: (\S+)", old, re.M)
+    if match:
+        return match.group(1)
+    return git_last_data_change(path) or now
+
+
 def render_file(name, sections, target, updated, notes):
     path = ROOT / (f"rules/surge/{name}.list" if target == "surge" else f"rules/mihomo/{name}.yaml")
     groups = {}
@@ -320,7 +361,11 @@ def render_file(name, sections, target, updated, notes):
     header = [f"# NAME: {name}", f"# REPO: {REPO}", f"# UPDATED: {updated}", *sources, *counts, f"# TOTAL: {total}"]
     if target == "mihomo":
         body = ["", "payload:"] + body[1:]
-    return path, "\n".join(header + body) + "\n", total
+    text = "\n".join(header + body) + "\n"
+    changed = last_changed(path, text, updated)
+    text = text.replace(f"# UPDATED: {updated}\n",
+                        f"# UPDATED: {updated}\n# CHANGED: {changed}\n", 1)
+    return path, text, total
 
 
 def asns_of(section):
